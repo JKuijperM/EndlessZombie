@@ -32,6 +32,10 @@ class ENDLESSZOMBIE_API AZombieCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* MoveAction;
 
+	/** Crouch Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* CrouchAction;
+
 public:
 	// Sets default values for this character's properties
 	AZombieCharacter();
@@ -42,6 +46,9 @@ protected:
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void Move(const FInputActionValue& Value);
+	void Crouch(const FInputActionValue& Value);
 
 public:
 	// Called every frame
