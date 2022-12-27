@@ -68,6 +68,7 @@ void AZombieCharacter::BeginPlay()
 void AZombieCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	MoveForwardConstant(DeltaTime);
 
 }
 
@@ -115,4 +116,12 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 void AZombieCharacter::Crouch(const FInputActionValue& Value)
 {
 
+}
+
+void AZombieCharacter::MoveForwardConstant(float DeltaTime)
+{
+	FVector vLocation = GetActorLocation();
+	vLocation += GetActorForwardVector() * fBaseSpeed * DeltaTime;
+	SetActorLocation(vLocation);
+	
 }

@@ -63,4 +63,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float fBaseSpeed = 100.f;
 
+
+private:
+
+	void MoveForwardConstant(float DeltaTime);
 };
