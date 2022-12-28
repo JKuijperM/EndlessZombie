@@ -48,7 +48,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
-	void Crouch(const FInputActionValue& Value);
+	//void Crouch(const FInputActionValue& Value);
 
 public:
 	// Called every frame

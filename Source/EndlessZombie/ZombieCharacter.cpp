@@ -87,7 +87,9 @@ void AZombieCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Move);
 
 		// Crouching
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Crouch);
+		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Crouch);
+		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacter::);
+		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ACharacter::StopCrouching);
 	}
 }
 
@@ -113,10 +115,10 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AZombieCharacter::Crouch(const FInputActionValue& Value)
-{
-
-}
+//void AZombieCharacter::Crouch(const FInputActionValue& Value)
+//{
+//
+//}
 
 void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
