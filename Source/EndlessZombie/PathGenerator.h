@@ -11,8 +11,8 @@ UCLASS()
 class ENDLESSZOMBIE_API APathGenerator : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	APathGenerator();
 
@@ -20,15 +20,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	/*UPROPERTY(EditAnywhere, Category = "Tiles")
+		TSubclassOf<class ATile> Tile;*/
 	UPROPERTY(EditAnywhere, Category = "Tiles")
-		TSubclassOf<class ATile> Tile;
+		TArray<TSubclassOf<class ATile>> Tiles;
+	UPROPERTY(EditAnywhere, Category = "Tiles")
+		int iInitialStraightTiles = 10;
 
 	UFUNCTION(Category = "Tiles")
 		void AddFloorTile();
+
+	void AddSelectedTile(TSubclassOf<class ATile> Tile);
 
 	FTransform tNextSpawnPoint = FTransform(FVector(90.0f, 1110.0f, 0.0f));
 };

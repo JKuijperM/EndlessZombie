@@ -16,10 +16,11 @@ void APathGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < iInitialStraightTiles; i++)
 	{
-		AddFloorTile();
+		AddSelectedTile(Tiles[0]);
 	}
+	AddSelectedTile(Tiles[1]);
 	
 }
 
@@ -32,10 +33,19 @@ void APathGenerator::Tick(float DeltaTime)
 
 void APathGenerator::AddFloorTile()
 {
+	if (Tiles[0] != nullptr)
+	{
+		ATile* GeneratedTile = GetWorld()->SpawnActor<ATile>(Tiles[0], tNextSpawnPoint);
+		tNextSpawnPoint = GeneratedTile->GetAttachTransform();
+	}	
+}
+
+void APathGenerator::AddSelectedTile(TSubclassOf<class ATile> Tile)
+{
 	if (Tile != nullptr)
 	{
 		ATile* GeneratedTile = GetWorld()->SpawnActor<ATile>(Tile, tNextSpawnPoint);
 		tNextSpawnPoint = GeneratedTile->GetAttachTransform();
-	}	
+	}
 }
 

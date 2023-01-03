@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Components/TimelineComponent.h"
 #include "ZombieCharacter.generated.h"
 
 UCLASS()
@@ -13,11 +14,11 @@ class ENDLESSZOMBIE_API AZombieCharacter : public ACharacter
 	GENERATED_BODY()
 
 	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
 	/** MappingContext */
@@ -63,8 +64,38 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float fBaseSpeed = 100.f;
 
+	void RotateCharacter();
+	bool bStraight = true;
+	FRotator NewRotation = FRotator(0.f, 0.f, 0.f);
+
+	// Properties for the timeline to turn right
+	UFUNCTION()
+		void ControlTurning();
+	UFUNCTION()
+		void SetState();
+	UPROPERTY(EditAnywhere, Category = "Movement")
+		UCurveFloat* TurnCurve;
+	bool bReadyState;
+	float fCurveValue;
+	float fDistanceValue;
+	float fTimelineValue;
+	FTimeline TurnTimeline;
+	bool bTurning = false;
+	bool bRotate = false;
+
+	TMap<int, FVector> mDirections;
+	int iCurrentDirection = 0;
+	FVector vCurrentDirection;
+
+	void UpdateDirection(int i);
 
 private:
 
 	void MoveForwardConstant(float DeltaTime);
+
+	void PlayTurn();
+
+	float fControlTurn = 0.f;
+	float fPrevCurvValue = 0.f;
+
 };

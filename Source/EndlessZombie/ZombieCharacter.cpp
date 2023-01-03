@@ -26,7 +26,7 @@ AZombieCharacter::AZombieCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
@@ -37,17 +37,28 @@ AZombieCharacter::AZombieCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.f; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraBoom->SetWorldLocation(FVector(0.f, 0.f, 180.f));
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	FollowCamera->SetWorldRotation(FQuat(FRotator(-15.f, 0.f, 0.f)));
+
+	// For timeline
+	bReadyState = true;
+
+	mDirections.Add(0, FVector(1, 0, 0));
+	mDirections.Add(1, FVector(0, 1, 0));
+	mDirections.Add(2, FVector(-1, 0, 0));
+	mDirections.Add(3, FVector(0, -1, 0));
+
+	vCurrentDirection = mDirections[0];
 }
 
 // Called when the game starts or when spawned
@@ -62,14 +73,35 @@ void AZombieCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	//CurrentRotation = GetActorRotation();
+
+	if (TurnCurve)
+	{
+		FOnTimelineFloat TimelineCallback;
+		FOnTimelineEventStatic TimelineFisihedCallback;
+
+		TimelineCallback.BindUFunction(this, FName("ControlTurning"));
+		TimelineFisihedCallback.BindUFunction(this, FName("SetState"));
+		TurnTimeline.AddInterpFloat(TurnCurve, TimelineCallback);
+		TurnTimeline.SetTimelineFinishedFunc(TimelineFisihedCallback);
+	}
 }
 
 // Called every frame
 void AZombieCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveForwardConstant(DeltaTime);
 
+	TurnTimeline.TickTimeline(DeltaTime);
+
+	if (!bTurning)
+	{
+		MoveForwardConstant(DeltaTime);
+	}
+
+	//NewRotation.Yaw += 5.f;
+	//RotateCharacter(a);
 }
 
 // Called to bind functionality to input
@@ -122,8 +154,89 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 
 void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
-	FVector vLocation = GetActorLocation();
-	vLocation += GetActorForwardVector() * fBaseSpeed * DeltaTime;
-	SetActorLocation(vLocation);
-	
+	if (bStraight)
+	{
+		FVector vLocation = GetActorLocation();
+		vLocation += GetActorForwardVector() * fBaseSpeed * DeltaTime;
+		SetActorLocation(vLocation);
+	}
+	else
+	{
+
+		RotateCharacter();
+		FVector vLocation = GetActorLocation();
+		/*FVector forward = GetActorForwardVector();
+		UE_LOG(LogTemp, Warning, TEXT("x: %.2f, y: %.2f, z: %.2f"), forward.X, forward.Y, forward.Z);*/
+		vLocation += vCurrentDirection * 30.f * DeltaTime;
+		SetActorLocation(vLocation);
+		bStraight = true;
+	}
+
+}
+
+void AZombieCharacter::PlayTurn()
+{
+	bTurning = true;
+	if (fControlTurn < 90.f)
+	{
+		TurnTimeline.PlayFromStart();
+	}
+	else
+	{
+		fControlTurn = 0.f;
+	}
+}
+
+void AZombieCharacter::UpdateDirection(int i)
+{
+	iCurrentDirection += i;
+	if (iCurrentDirection > mDirections.Num())
+	{
+		iCurrentDirection = 0;
+	}
+	else if (iCurrentDirection < 0)
+	{
+		iCurrentDirection = mDirections.Num();
+	}
+
+	vCurrentDirection = mDirections[iCurrentDirection];
+}
+
+void AZombieCharacter::RotateCharacter()
+{
+	FRotator CurrentRotation = GetActorRotation();
+	PlayTurn();
+	UE_LOG(LogTemp, Warning, TEXT("Girao"));
+	//Controller->SetControlRotation(NewRotation + CurrentRotation);
+}
+
+void AZombieCharacter::ControlTurning()
+{
+	fTimelineValue = TurnTimeline.GetPlaybackPosition();
+	float fTurnCurve = TurnCurve->GetFloatValue(fTimelineValue);
+	UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] TurnCurve: %f"), fTurnCurve);
+
+	float fVal = fTurnCurve - fPrevCurvValue;
+	fPrevCurvValue = fTurnCurve;
+
+	fControlTurn += fVal;
+
+	if (fControlTurn <= 90.f)
+	{
+		FRotator CurrentRotation = Controller->GetControlRotation();
+		CurrentRotation.Yaw += fVal;
+		Controller->SetControlRotation(CurrentRotation);
+		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Yaw: %f"), CurrentRotation.Yaw);
+		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Control Turn: %f"), fControlTurn);
+		
+	}
+
+}
+
+void AZombieCharacter::SetState()
+{
+	bReadyState = true;
+	bTurning = false;
+	bStraight = true;
+	UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::SetState] Set state"));
 }

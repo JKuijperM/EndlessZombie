@@ -65,7 +65,7 @@ void ATile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 			FTimerHandle TimerHandle;
 			
 			//GetWorldTimerManager().SetTimer(TimerHandle, this, &ATimeKollapsed_PlayerController::AddWidgetToViewPort, GameOverDelay, false);
-			GetWorldTimerManager().SetTimer(TimerHandle, this, &ATile::test, 2.f, false);
+			GetWorldTimerManager().SetTimer(TimerHandle, this, &ATile::DestroyTile, 2.f, false);
 			
 		}
 	}
