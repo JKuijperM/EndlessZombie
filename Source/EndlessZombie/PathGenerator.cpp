@@ -21,6 +21,7 @@ void APathGenerator::BeginPlay()
 		AddSelectedTile(Tiles[0]);
 	}
 	AddSelectedTile(Tiles[1]);
+	AddSelectedTile(Tiles[2]);
 	
 }
 

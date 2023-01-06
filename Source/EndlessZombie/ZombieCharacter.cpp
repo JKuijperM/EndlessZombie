@@ -99,9 +99,6 @@ void AZombieCharacter::Tick(float DeltaTime)
 	{
 		MoveForwardConstant(DeltaTime);
 	}
-
-	//NewRotation.Yaw += 5.f;
-	//RotateCharacter(a);
 }
 
 // Called to bind functionality to input
@@ -187,27 +184,11 @@ void AZombieCharacter::PlayTurn()
 	}
 }
 
-void AZombieCharacter::UpdateDirection(int i)
-{
-	iCurrentDirection += i;
-	if (iCurrentDirection > mDirections.Num())
-	{
-		iCurrentDirection = 0;
-	}
-	else if (iCurrentDirection < 0)
-	{
-		iCurrentDirection = mDirections.Num();
-	}
-
-	vCurrentDirection = mDirections[iCurrentDirection];
-}
-
 void AZombieCharacter::RotateCharacter()
 {
 	FRotator CurrentRotation = GetActorRotation();
+	fControlTurn = 0.f;
 	PlayTurn();
-	UE_LOG(LogTemp, Warning, TEXT("Girao"));
-	//Controller->SetControlRotation(NewRotation + CurrentRotation);
 }
 
 void AZombieCharacter::ControlTurning()
@@ -224,11 +205,10 @@ void AZombieCharacter::ControlTurning()
 	if (fControlTurn <= 90.f)
 	{
 		FRotator CurrentRotation = Controller->GetControlRotation();
-		CurrentRotation.Yaw += fVal;
+		CurrentRotation.Yaw += fVal * iSideTurn;
 		Controller->SetControlRotation(CurrentRotation);
 		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Yaw: %f"), CurrentRotation.Yaw);
-		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Control Turn: %f"), fControlTurn);
-		
+		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Control Turn: %f"), fControlTurn);		
 	}
 
 }
@@ -238,5 +218,5 @@ void AZombieCharacter::SetState()
 	bReadyState = true;
 	bTurning = false;
 	bStraight = true;
-	UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::SetState] Set state"));
+	fPrevCurvValue = 0.f;
 }

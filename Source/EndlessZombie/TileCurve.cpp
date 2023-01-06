@@ -30,22 +30,17 @@ void ATileCurve::TurnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		if (!bWasTriggered)
 		{
-			// Yaw
-			float fYawValue;
-
 			if (bTurnRight && !bTurnLeft)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[ATileCurve::OnBeginOverlapChild] Rotating right"));
-				fYawValue = 90.f;
-				FRotator NewRotation = FRotator(0.f, fYawValue, 0.f);
 				ZombieCharacter->bStraight = false;
-				ZombieCharacter->NewRotation = NewRotation;
-				//ZombieCharacter->RotateCharacter(NewRotation);
+				ZombieCharacter->iSideTurn = 1;
 			}
 			else if (!bTurnRight && bTurnLeft)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("[ATileCurve::OnBeginOverlapChild] Rotating left"));
-				fYawValue = -90.f;
+				ZombieCharacter->bStraight = false;
+				ZombieCharacter->iSideTurn = -1;
 			}
 			else
 			{

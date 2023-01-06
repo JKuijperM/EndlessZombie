@@ -66,7 +66,7 @@ public:
 
 	void RotateCharacter();
 	bool bStraight = true;
-	FRotator NewRotation = FRotator(0.f, 0.f, 0.f);
+	int iSideTurn = 1;
 
 	// Properties for the timeline to turn right
 	UFUNCTION()
@@ -86,8 +86,6 @@ public:
 	TMap<int, FVector> mDirections;
 	int iCurrentDirection = 0;
 	FVector vCurrentDirection;
-
-	void UpdateDirection(int i);
 
 private:
 
