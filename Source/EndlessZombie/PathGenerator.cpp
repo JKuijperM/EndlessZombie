@@ -6,7 +6,7 @@
 // Sets default values
 APathGenerator::APathGenerator()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -22,7 +22,7 @@ void APathGenerator::BeginPlay()
 	}
 	AddSelectedTile(Tiles[1]);
 	AddSelectedTile(Tiles[2]);
-	
+
 }
 
 // Called every frame
@@ -36,9 +36,11 @@ void APathGenerator::AddFloorTile()
 {
 	if (Tiles[0] != nullptr)
 	{
-		ATile* GeneratedTile = GetWorld()->SpawnActor<ATile>(Tiles[0], tNextSpawnPoint);
+
+		int iRandomIndex = FMath::RandRange(0, Tiles.Num() - 1);
+		ATile* GeneratedTile = GetWorld()->SpawnActor<ATile>(Tiles[iRandomIndex], tNextSpawnPoint);
 		tNextSpawnPoint = GeneratedTile->GetAttachTransform();
-	}	
+	}
 }
 
 void APathGenerator::AddSelectedTile(TSubclassOf<class ATile> Tile)

@@ -195,7 +195,6 @@ void AZombieCharacter::ControlTurning()
 {
 	fTimelineValue = TurnTimeline.GetPlaybackPosition();
 	float fTurnCurve = TurnCurve->GetFloatValue(fTimelineValue);
-	UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] TurnCurve: %f"), fTurnCurve);
 
 	float fVal = fTurnCurve - fPrevCurvValue;
 	fPrevCurvValue = fTurnCurve;
@@ -206,9 +205,7 @@ void AZombieCharacter::ControlTurning()
 	{
 		FRotator CurrentRotation = Controller->GetControlRotation();
 		CurrentRotation.Yaw += fVal * iSideTurn;
-		Controller->SetControlRotation(CurrentRotation);
-		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Yaw: %f"), CurrentRotation.Yaw);
-		UE_LOG(LogTemp, Warning, TEXT("[AZombieCharacter::ControlTurning] Control Turn: %f"), fControlTurn);		
+		Controller->SetControlRotation(CurrentRotation);		
 	}
 
 }
