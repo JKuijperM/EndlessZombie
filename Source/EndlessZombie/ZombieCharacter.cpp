@@ -153,19 +153,14 @@ void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
 	if (bStraight)
 	{
-		FVector vLocation = GetActorLocation();
-		vLocation += GetActorForwardVector() * fBaseSpeed * DeltaTime;
+		FVector vLocation = GetActorLocation();		
+		fBaseSpeed += fAcceleration * DeltaTime;
+		vLocation += GetActorForwardVector() * fBaseSpeed;
 		SetActorLocation(vLocation);
 	}
 	else
 	{
-
 		RotateCharacter();
-		FVector vLocation = GetActorLocation();
-		/*FVector forward = GetActorForwardVector();
-		UE_LOG(LogTemp, Warning, TEXT("x: %.2f, y: %.2f, z: %.2f"), forward.X, forward.Y, forward.Z);*/
-		vLocation += vCurrentDirection * 30.f * DeltaTime;
-		SetActorLocation(vLocation);
 		bStraight = true;
 	}
 

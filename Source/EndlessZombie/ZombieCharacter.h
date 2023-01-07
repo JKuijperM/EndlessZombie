@@ -62,7 +62,9 @@ public:
 
 	// Base speed
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float fBaseSpeed = 100.f;
+		float fBaseSpeed = 5.f;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+		float fAcceleration = .001f; 
 
 	void RotateCharacter();
 	bool bStraight = true;
