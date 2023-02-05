@@ -37,4 +37,7 @@ public:
 	void AddSelectedTile(TSubclassOf<class ATile> Tile);
 
 	FTransform tNextSpawnPoint = FTransform(FVector(90.0f, 1110.0f, 0.0f));
+
+private:
+	bool bIsCurveLastTile = false;
 };

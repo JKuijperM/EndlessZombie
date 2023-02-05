@@ -15,6 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	AObstacle();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USceneComponent* SceneComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* StaticMesh;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

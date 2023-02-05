@@ -2,6 +2,7 @@
 
 
 #include "PathGenerator.h"
+#include "TileCurve.h"
 
 // Sets default values
 APathGenerator::APathGenerator()
@@ -34,11 +35,19 @@ void APathGenerator::Tick(float DeltaTime)
 
 void APathGenerator::AddFloorTile()
 {
-	if (Tiles[0] != nullptr)
+	if (Tiles.Num() > 0)
 	{
+		int iRandomIndex;
+		if (!bIsCurveLastTile)
+			iRandomIndex = FMath::RandRange(0, Tiles.Num() - 1);
+		else
+			iRandomIndex = 0;
 
-		int iRandomIndex = FMath::RandRange(0, Tiles.Num() - 1);
 		ATile* GeneratedTile = GetWorld()->SpawnActor<ATile>(Tiles[iRandomIndex], tNextSpawnPoint);
+		if (Cast<ATileCurve>(GeneratedTile))
+			bIsCurveLastTile = true;
+		else
+			bIsCurveLastTile = false;
 		tNextSpawnPoint = GeneratedTile->GetAttachTransform();
 	}
 }
