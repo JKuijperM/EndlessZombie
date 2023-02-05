@@ -18,6 +18,8 @@
 # files if adding them here.
 !/Content/**/*.uasset
 !/Content/**/*.umap
+/Content/__ExternalObjects__
+/Content/__ExternalActors__
 
 # Allow any files from /RawContent dir.
 # Any file in /RawContent dir will be managed by git lfs.
