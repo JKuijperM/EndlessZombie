@@ -9,7 +9,6 @@ ATileCurve::ATileCurve()
 	TurnTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("TurnTrigger"));
 	TurnTrigger->SetupAttachment(SceneComponent);
 	TurnTrigger->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
-	//TurnTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATileCurve::TurnBeginOverlap);
 }
 
 
