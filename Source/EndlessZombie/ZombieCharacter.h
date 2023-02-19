@@ -89,6 +89,8 @@ public:
 	int iCurrentDirection = 0;
 	FVector vCurrentDirection;
 
+	void Die();
+
 private:
 
 	void MoveForwardConstant(float DeltaTime);
@@ -97,5 +99,7 @@ private:
 
 	float fControlTurn = 0.f;
 	float fPrevCurvValue = 0.f;
+
+	bool bDied = false;
 
 };

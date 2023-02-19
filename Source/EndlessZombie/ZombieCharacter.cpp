@@ -93,11 +93,15 @@ void AZombieCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!bDied)
+	{
+
 	TurnTimeline.TickTimeline(DeltaTime);
 
 	if (!bTurning)
 	{
 		MoveForwardConstant(DeltaTime);
+	}
 	}
 }
 
@@ -148,6 +152,28 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 //{
 //
 //}
+
+void AZombieCharacter::Die()
+{
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	SetActorEnableCollision(true);
+
+	// Ragdoll
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+
+	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	if (CharacterComp)
+	{
+		CharacterComp->StopMovementImmediately();
+		CharacterComp->DisableMovement();
+		CharacterComp->SetComponentTickEnabled(false);
+	}
+
+	bDied = true;
+}
 
 void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
