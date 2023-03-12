@@ -13,6 +13,8 @@ class AEndlessZombieGameMode : public AGameModeBase
 
 public:
 	AEndlessZombieGameMode();
+
+	void RestartLevel();
 };
 
 

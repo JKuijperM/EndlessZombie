@@ -2,6 +2,7 @@
 
 #include "EndlessZombieGameMode.h"
 #include "EndlessZombieCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
 AEndlessZombieGameMode::AEndlessZombieGameMode()
@@ -12,4 +13,10 @@ AEndlessZombieGameMode::AEndlessZombieGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+}
+
+void AEndlessZombieGameMode::RestartLevel()
+{
+	FName LevelName = FName(GetWorld()->GetCurrentLevel()->GetName());
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }

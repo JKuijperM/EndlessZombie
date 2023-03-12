@@ -42,9 +42,6 @@ void AObstacle::CollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 {
 	if (OtherActor->IsA(AZombieCharacter::StaticClass()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AObstacle::CollisionBeginOverlap] Se ha chocao Paco"));
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Se ha chocao Paco"));
-
 		AZombieCharacter* ZombieCharacter = Cast<AZombieCharacter>(OtherActor);
 		ZombieCharacter->Die();
 	}

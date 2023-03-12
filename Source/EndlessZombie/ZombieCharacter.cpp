@@ -2,14 +2,16 @@
 
 
 #include "ZombieCharacter.h"
+#include "EndlessZombieGameMode.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/Controller.h"
+#include "Components/InputComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AZombieCharacter::AZombieCharacter()
@@ -96,12 +98,12 @@ void AZombieCharacter::Tick(float DeltaTime)
 	if (!bDied)
 	{
 
-	TurnTimeline.TickTimeline(DeltaTime);
+		TurnTimeline.TickTimeline(DeltaTime);
 
-	if (!bTurning)
-	{
-		MoveForwardConstant(DeltaTime);
-	}
+		if (!bTurning)
+		{
+			MoveForwardConstant(DeltaTime);
+		}
 	}
 }
 
@@ -123,6 +125,9 @@ void AZombieCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Crouch);
 		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ACharacter::);
 		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ACharacter::StopCrouching);
+
+		// RestartLevel
+		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Started, this, &AZombieCharacter::RestartLevel);
 	}
 }
 
@@ -145,6 +150,15 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void AZombieCharacter::RestartLevel()
+{
+	AEndlessZombieGameMode* CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (CurrentGameMode)
+	{
+		CurrentGameMode->RestartLevel();
 	}
 }
 
@@ -179,7 +193,7 @@ void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
 	if (bStraight)
 	{
-		FVector vLocation = GetActorLocation();		
+		FVector vLocation = GetActorLocation();
 		fBaseSpeed += fAcceleration * DeltaTime;
 		vLocation += GetActorForwardVector() * fBaseSpeed;
 		SetActorLocation(vLocation);
@@ -226,7 +240,7 @@ void AZombieCharacter::ControlTurning()
 	{
 		FRotator CurrentRotation = Controller->GetControlRotation();
 		CurrentRotation.Yaw += fVal * iSideTurn;
-		Controller->SetControlRotation(CurrentRotation);		
+		Controller->SetControlRotation(CurrentRotation);
 	}
 
 }

@@ -36,6 +36,9 @@ class ENDLESSZOMBIE_API AZombieCharacter : public ACharacter
 	/** Crouch Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* CrouchAction;
+	// Restart Input Action
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* RestartAction;
 
 public:
 	// Sets default values for this character's properties
@@ -50,6 +53,7 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	//void Crouch(const FInputActionValue& Value);
+	void RestartLevel();
 
 public:
 	// Called every frame
