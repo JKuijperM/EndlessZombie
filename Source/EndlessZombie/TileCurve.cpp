@@ -27,23 +27,6 @@ void ATileCurve::TurnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 	if (ZombieCharacter != nullptr)
 	{
-		if (!bWasTriggered)
-		{
-			if (bTurnRight && !bTurnLeft)
-			{
-				ZombieCharacter->bStraight = false;
-				ZombieCharacter->iSideTurn = 1;
-			}
-			else if (!bTurnRight && bTurnLeft)
-			{
-				ZombieCharacter->bStraight = false;
-				ZombieCharacter->iSideTurn = -1;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("[ATileCurve::OnBeginOverlapChild] You should not be here, check if bTurnRight and bTurnLeft have the same value."))
-			}
-			bWasTriggered = true;
-		}
+		ZombieCharacter->bCanTurn = true;		
 	}
 }

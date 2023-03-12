@@ -52,6 +52,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
+	void CanTurn(const FInputActionValue& Value);
 	//void Crouch(const FInputActionValue& Value);
 	void RestartLevel();
 
@@ -70,28 +71,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float fAcceleration = .001f; 
 
-	void RotateCharacter();
-	bool bStraight = true;
-	int iSideTurn = 1;
-
-	// Properties for the timeline to turn right
-	UFUNCTION()
-		void ControlTurning();
-	UFUNCTION()
-		void SetState();
+	bool bCanTurn = false;
+	FRotator rDesireRotation = FRotator(0.f, 0.f, 0.f);
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		UCurveFloat* TurnCurve;
-	bool bReadyState;
-	float fCurveValue;
-	float fDistanceValue;
-	float fTimelineValue;
-	FTimeline TurnTimeline;
-	bool bTurning = false;
-	bool bRotate = false;
-
-	TMap<int, FVector> mDirections;
-	int iCurrentDirection = 0;
-	FVector vCurrentDirection;
+		float fTurnSpeed = 10.f;
 
 	void Die();
 
@@ -99,11 +82,8 @@ private:
 
 	void MoveForwardConstant(float DeltaTime);
 
-	void PlayTurn();
-
-	float fControlTurn = 0.f;
-	float fPrevCurvValue = 0.f;
-
 	bool bDied = false;
+
+	void TurnCorner(float DeltaTime);
 
 };

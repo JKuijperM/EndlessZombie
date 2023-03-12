@@ -52,15 +52,6 @@ AZombieCharacter::AZombieCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	FollowCamera->SetWorldRotation(FQuat(FRotator(-15.f, 0.f, 0.f)));
 
-	// For timeline
-	bReadyState = true;
-
-	mDirections.Add(0, FVector(1, 0, 0));
-	mDirections.Add(1, FVector(0, 1, 0));
-	mDirections.Add(2, FVector(-1, 0, 0));
-	mDirections.Add(3, FVector(0, -1, 0));
-
-	vCurrentDirection = mDirections[0];
 }
 
 // Called when the game starts or when spawned
@@ -75,19 +66,6 @@ void AZombieCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-
-	//CurrentRotation = GetActorRotation();
-
-	if (TurnCurve)
-	{
-		FOnTimelineFloat TimelineCallback;
-		FOnTimelineEventStatic TimelineFisihedCallback;
-
-		TimelineCallback.BindUFunction(this, FName("ControlTurning"));
-		TimelineFisihedCallback.BindUFunction(this, FName("SetState"));
-		TurnTimeline.AddInterpFloat(TurnCurve, TimelineCallback);
-		TurnTimeline.SetTimelineFinishedFunc(TimelineFisihedCallback);
-	}
 }
 
 // Called every frame
@@ -97,13 +75,7 @@ void AZombieCharacter::Tick(float DeltaTime)
 
 	if (!bDied)
 	{
-
-		TurnTimeline.TickTimeline(DeltaTime);
-
-		if (!bTurning)
-		{
-			MoveForwardConstant(DeltaTime);
-		}
+		MoveForwardConstant(DeltaTime);
 	}
 }
 
@@ -120,6 +92,8 @@ void AZombieCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AZombieCharacter::CanTurn);
+
 
 		// Crouching
 		//EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AZombieCharacter::Crouch);
@@ -141,15 +115,20 @@ void AZombieCharacter::Move(const FInputActionValue& Value)
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
+		// add movement
 		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+void AZombieCharacter::CanTurn(const FInputActionValue& Value)
+{
+	float fTurnSide = Value.Get<FVector2D>().X;
+	if (bCanTurn)
+	{
+		rDesireRotation = rDesireRotation + FRotator(0.f, fTurnSide * 90.f, 0.f);
+		bCanTurn = false;
 	}
 }
 
@@ -191,64 +170,29 @@ void AZombieCharacter::Die()
 
 void AZombieCharacter::MoveForwardConstant(float DeltaTime)
 {
-	if (bStraight)
+	if (Controller)
 	{
+		TurnCorner(DeltaTime);
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		//UE_LOG(LogTemp, Warning, TEXT("%f"), fBaseSpeed);
 		FVector vLocation = GetActorLocation();
 		fBaseSpeed += fAcceleration * DeltaTime;
 		vLocation += GetActorForwardVector() * fBaseSpeed;
 		SetActorLocation(vLocation);
-	}
-	else
-	{
-		RotateCharacter();
-		bStraight = true;
-	}
-
-}
-
-void AZombieCharacter::PlayTurn()
-{
-	bTurning = true;
-	if (fControlTurn < 90.f)
-	{
-		TurnTimeline.PlayFromStart();
-	}
-	else
-	{
-		fControlTurn = 0.f;
+		//AddMovementInput(ForwardDirection, .5f, true);
 	}
 }
 
-void AZombieCharacter::RotateCharacter()
+void AZombieCharacter::TurnCorner(float DeltaTime)
 {
-	FRotator CurrentRotation = GetActorRotation();
-	fControlTurn = 0.f;
-	PlayTurn();
-}
-
-void AZombieCharacter::ControlTurning()
-{
-	fTimelineValue = TurnTimeline.GetPlaybackPosition();
-	float fTurnCurve = TurnCurve->GetFloatValue(fTimelineValue);
-
-	float fVal = fTurnCurve - fPrevCurvValue;
-	fPrevCurvValue = fTurnCurve;
-
-	fControlTurn += fVal;
-
-	if (fControlTurn <= 90.f)
+	if (GetControlRotation() != rDesireRotation)
 	{
-		FRotator CurrentRotation = Controller->GetControlRotation();
-		CurrentRotation.Yaw += fVal * iSideTurn;
-		Controller->SetControlRotation(CurrentRotation);
+		FRotator rNewRotation = FMath::RInterpTo(GetControlRotation(), rDesireRotation, DeltaTime, fTurnSpeed);
+		Controller->SetControlRotation(rNewRotation);
 	}
-
-}
-
-void AZombieCharacter::SetState()
-{
-	bReadyState = true;
-	bTurning = false;
-	bStraight = true;
-	fPrevCurvValue = 0.f;
 }
