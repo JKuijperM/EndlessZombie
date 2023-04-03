@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
 #include "ZombieCharacter.generated.h"
 
@@ -70,6 +70,8 @@ public:
 		float fBaseSpeed = 5.f;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float fAcceleration = .001f; 
+	UPROPERTY(EditAnywhere, Category = "Life")
+		int iPlayerLife = 3;
 
 	bool bCanTurn = false;
 	FRotator rDesireRotation = FRotator(0.f, 0.f, 0.f);
@@ -77,13 +79,29 @@ public:
 		float fTurnSpeed = 10.f;
 
 	void Die();
+	void ObstacleCollision();
+	void PlayFlashEffect(float fMultiplier = 1.f, FLinearColor Color = FLinearColor(1.f, 1.f, 1.f, 1.f), float fPlayRate = 5.f);
+
+	// Properties for the timeline to turn right
+	UFUNCTION()
+		void ControlFlashing();
+	UFUNCTION()
+		void SetState();
+	UPROPERTY(EditAnywhere, Category = "Life")
+		UCurveFloat* FlashCurve;
+	bool bReadyState;
+	float fCurveValue;
+	float fDistanceValue;
+	float fTimelineValue;
+	FTimeline FlashTimeline;
 
 private:
 
 	void MoveForwardConstant(float DeltaTime);
-
-	bool bDied = false;
-
 	void TurnCorner(float DeltaTime);
 
+	bool bDied = false;
+	float fGlobalMultiplier = 1.f;
+
+	UMaterialInstanceDynamic* DynamicFlashMaterial;
 };

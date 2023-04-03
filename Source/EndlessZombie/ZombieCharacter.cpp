@@ -1,6 +1,5 @@
 // Copyright Jorge Kuijper. All Rights Reserved.
 
-
 #include "ZombieCharacter.h"
 #include "EndlessZombieGameMode.h"
 #include "Camera/CameraComponent.h"
@@ -52,6 +51,7 @@ AZombieCharacter::AZombieCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	FollowCamera->SetWorldRotation(FQuat(FRotator(-15.f, 0.f, 0.f)));
 
+	bReadyState = true;
 }
 
 // Called when the game starts or when spawned
@@ -66,12 +66,27 @@ void AZombieCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	DynamicFlashMaterial = GetMesh()->CreateDynamicMaterialInstance(0);
+
+	if (FlashCurve)
+	{
+		FOnTimelineFloat TimelineCallback;
+		FOnTimelineEventStatic TimelineFisihedCallback;
+
+		TimelineCallback.BindUFunction(this, FName("ControlFlashing"));
+		TimelineFisihedCallback.BindUFunction(this, FName("SetState"));
+		FlashTimeline.AddInterpFloat(FlashCurve, TimelineCallback);
+		FlashTimeline.SetTimelineFinishedFunc(TimelineFisihedCallback);
+	}
 }
 
 // Called every frame
 void AZombieCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FlashTimeline.TickTimeline(DeltaTime);
 
 	if (!bDied)
 	{
@@ -166,6 +181,45 @@ void AZombieCharacter::Die()
 	}
 
 	bDied = true;
+}
+
+void AZombieCharacter::ObstacleCollision()
+{
+	iPlayerLife--;
+	if (iPlayerLife > 0)
+	{
+		PlayFlashEffect();
+	}
+	else
+	{
+		Die();
+	}
+}
+
+void AZombieCharacter::PlayFlashEffect(float fMultiplier, FLinearColor Color, float fPlayRate)
+{
+	if (DynamicFlashMaterial)
+	{
+		fGlobalMultiplier = fMultiplier;
+		DynamicFlashMaterial->SetScalarParameterValue("FlashMultiplier", fMultiplier);
+		DynamicFlashMaterial->SetVectorParameterValue("FlashColor", Color);
+		FlashTimeline.SetPlayRate(fPlayRate);
+		FlashTimeline.PlayFromStart();
+	}
+}
+
+void AZombieCharacter::ControlFlashing()
+{
+	fTimelineValue = FlashTimeline.GetPlaybackPosition();
+	float fFlashCurve = FlashCurve->GetFloatValue(fTimelineValue);
+	
+	float alpha = FMath::Lerp(0.f, fGlobalMultiplier, fFlashCurve);
+	DynamicFlashMaterial->SetScalarParameterValue("FlashMultiplier", alpha);
+}
+
+void AZombieCharacter::SetState()
+{
+	bReadyState = true;
 }
 
 void AZombieCharacter::MoveForwardConstant(float DeltaTime)

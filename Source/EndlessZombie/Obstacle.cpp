@@ -40,10 +40,14 @@ void AObstacle::Tick(float DeltaTime)
 
 void AObstacle::CollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(AZombieCharacter::StaticClass()))
-	{
-		AZombieCharacter* ZombieCharacter = Cast<AZombieCharacter>(OtherActor);
-		ZombieCharacter->Die();
+	if (!bIsCollisioned) {
+		if (OtherActor->IsA(AZombieCharacter::StaticClass()))
+		{
+			AZombieCharacter* ZombieCharacter = Cast<AZombieCharacter>(OtherActor);
+			ZombieCharacter->ObstacleCollision();
+			bIsCollisioned = true;
+			StaticMesh->SetCollisionProfileName("NoCollision");
+		}
 	}
 }
 
