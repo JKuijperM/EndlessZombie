@@ -48,6 +48,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -69,9 +71,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float fBaseSpeed = 5.f;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float fAcceleration = .001f; 
-	UPROPERTY(EditAnywhere, Category = "Life")
-		int iPlayerLife = 3;
+		float fAcceleration = .01f;
 
 	bool bCanTurn = false;
 	FRotator rDesireRotation = FRotator(0.f, 0.f, 0.f);
@@ -94,6 +94,11 @@ public:
 	float fDistanceValue;
 	float fTimelineValue;
 	FTimeline FlashTimeline;
+
+	UPROPERTY(EditAnywhere, Category = "HUD")
+		TSubclassOf<class UZombiePlayerHUD> ZombiePlayerHUDClass;
+	UPROPERTY()
+		class UZombiePlayerHUD* ZombieHUD;
 
 private:
 

@@ -1,6 +1,8 @@
 // Copyright Jorge Kuijper. All Rights Reserved.
 
 #include "ZombieCharacter.h"
+#include "ZombiePlayerHUD.h"
+#include "Blueprint/UserWidget.h"
 #include "EndlessZombieGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
@@ -52,6 +54,10 @@ AZombieCharacter::AZombieCharacter()
 	FollowCamera->SetWorldRotation(FQuat(FRotator(-15.f, 0.f, 0.f)));
 
 	bReadyState = true;
+
+	// HUD
+	ZombiePlayerHUDClass = nullptr;
+	ZombieHUD = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -64,6 +70,12 @@ void AZombieCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+		if (ZombiePlayerHUDClass)
+		{
+			ZombieHUD = CreateWidget<UZombiePlayerHUD>(PlayerController, ZombiePlayerHUDClass);
+			if (ZombieHUD)
+				ZombieHUD->AddToPlayerScreen();
 		}
 	}
 
@@ -79,6 +91,17 @@ void AZombieCharacter::BeginPlay()
 		FlashTimeline.AddInterpFloat(FlashCurve, TimelineCallback);
 		FlashTimeline.SetTimelineFinishedFunc(TimelineFisihedCallback);
 	}
+}
+
+void AZombieCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (ZombieHUD)
+	{
+		ZombieHUD->RemoveFromParent();
+		ZombieHUD = nullptr;
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -185,14 +208,20 @@ void AZombieCharacter::Die()
 
 void AZombieCharacter::ObstacleCollision()
 {
-	iPlayerLife--;
-	if (iPlayerLife > 0)
+	AEndlessZombieGameMode* CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (CurrentGameMode)
 	{
-		PlayFlashEffect();
-	}
-	else
-	{
-		Die();
+		CurrentGameMode->iPlayerLife--;
+		if (CurrentGameMode->iPlayerLife > 0)
+		{
+			PlayFlashEffect();
+			ZombieHUD->ModifyLifeCounter();
+		}
+		else
+		{
+			ZombieHUD->ModifyLifeCounter();
+			Die();
+		}
 	}
 }
 
@@ -212,7 +241,7 @@ void AZombieCharacter::ControlFlashing()
 {
 	fTimelineValue = FlashTimeline.GetPlaybackPosition();
 	float fFlashCurve = FlashCurve->GetFloatValue(fTimelineValue);
-	
+
 	float alpha = FMath::Lerp(0.f, fGlobalMultiplier, fFlashCurve);
 	DynamicFlashMaterial->SetScalarParameterValue("FlashMultiplier", alpha);
 }

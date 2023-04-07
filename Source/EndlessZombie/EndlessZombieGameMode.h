@@ -15,6 +15,9 @@ public:
 	AEndlessZombieGameMode();
 
 	void RestartLevel();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Life")
+		int iPlayerLife = 3;
 };
 
 
