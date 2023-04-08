@@ -13,33 +13,43 @@ void UZombiePlayerHUD::NativeConstruct()
 
 	// ItemTitle can be nullptr if we haven't created it in the
 	// Blueprint subclass
-	if (TextLife)
+	if (TextLive)
 	{
-		TextLife->SetText(FText::FromString(TEXT("Lifes: ")));
+		TextLive->SetText(FText::FromString(TEXT("Lives: ")));
 	}
 
-	if (LifeImg01)
+	if (LiveImg01)
 	{
-		LifeImg01->SetBrushFromTexture(LifeGreenTexture);
+		LiveImg01->SetBrushFromTexture(LiveGreenTexture);
+	}
+
+	if (LiveImg02)
+	{
+		LiveImg02->SetBrushFromTexture(LiveGreenTexture);
+	}
+
+	if (LiveImg03)
+	{
+		LiveImg03->SetBrushFromTexture(LiveGreenTexture);
 	}
 
 	CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
-void UZombiePlayerHUD::ModifyLifeCounter()
+void UZombiePlayerHUD::ModifyLiveCounter()
 {
 	if (CurrentGameMode)
 	{
 		switch (CurrentGameMode->iPlayerLife)
 		{
 		case 2:
-			EmptyLife(LifeImg03);
+			EmptyLive(LiveImg03);
 			break;
 		case 1:
-			EmptyLife(LifeImg02);
+			EmptyLive(LiveImg02);
 			break;
 		case 0:
-			EmptyLife(LifeImg01);
+			EmptyLive(LiveImg01);
 			break;
 		default:
 			break;
@@ -48,10 +58,10 @@ void UZombiePlayerHUD::ModifyLifeCounter()
 	
 }
 
-void UZombiePlayerHUD::EmptyLife(UImage* LifeImg)
+void UZombiePlayerHUD::EmptyLive(UImage* LiveImg)
 {
-	if ((LifeImg) && (LifeGreyTexture))
+	if ((LiveImg) && (LiveGreyTexture))
 	{
-		LifeImg->SetBrushFromTexture(LifeGreyTexture);
+		LiveImg->SetBrushFromTexture(LiveGreyTexture);
 	}
 }

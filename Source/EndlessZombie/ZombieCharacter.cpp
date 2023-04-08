@@ -215,11 +215,11 @@ void AZombieCharacter::ObstacleCollision()
 		if (CurrentGameMode->iPlayerLife > 0)
 		{
 			PlayFlashEffect();
-			ZombieHUD->ModifyLifeCounter();
+			ZombieHUD->ModifyLiveCounter();
 		}
 		else
 		{
-			ZombieHUD->ModifyLifeCounter();
+			ZombieHUD->ModifyLiveCounter();
 			Die();
 		}
 	}

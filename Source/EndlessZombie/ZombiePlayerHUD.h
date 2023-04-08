@@ -22,22 +22,22 @@ protected:
 
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UTextBlock* TextLife;
+		UTextBlock* TextLive;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UImage* LifeImg01;
+		UImage* LiveImg01;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UImage* LifeImg02;
+		UImage* LiveImg02;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		UImage* LifeImg03;
+		UImage* LiveImg03;
 	UPROPERTY(EditAnywhere)
-		UTexture2D* LifeGreenTexture;
+		UTexture2D* LiveGreenTexture;
 	UPROPERTY(EditAnywhere)
-		UTexture2D* LifeGreyTexture;
+		UTexture2D* LiveGreyTexture;
 
 	AEndlessZombieGameMode* CurrentGameMode;
 
-	void ModifyLifeCounter();
+	void ModifyLiveCounter();
 
 private:
-	void EmptyLife(UImage* LifeImg);
+	void EmptyLive(UImage* LiveImg);
 };

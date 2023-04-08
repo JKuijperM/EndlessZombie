@@ -15,7 +15,8 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 	// Add scene component
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	SceneComponent->SetupAttachment(RootComponent);
+	RootComponent = SceneComponent;
+	//SceneComponent->SetupAttachment(RootComponent);
 	// Add arrow component like attach point
 	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("AttachPoint"));
 	ArrowComponent->SetupAttachment(SceneComponent);
