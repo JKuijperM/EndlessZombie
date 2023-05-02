@@ -33,10 +33,13 @@ public:
 		UTexture2D* LiveGreenTexture;
 	UPROPERTY(EditAnywhere)
 		UTexture2D* LiveGreyTexture;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		UTextBlock* TextScore;
 
 	AEndlessZombieGameMode* CurrentGameMode;
 
-	void ModifyLiveCounter();
+	void UpdateLiveCounter();
+	void UpdateScoreCounter(int iScore);
 
 private:
 	void EmptyLive(UImage* LiveImg);

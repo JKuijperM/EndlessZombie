@@ -48,8 +48,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -94,11 +92,6 @@ public:
 	float fDistanceValue;
 	float fTimelineValue;
 	FTimeline FlashTimeline;
-
-	UPROPERTY(EditAnywhere, Category = "HUD")
-		TSubclassOf<class UZombiePlayerHUD> ZombiePlayerHUDClass;
-	UPROPERTY()
-		class UZombiePlayerHUD* ZombieHUD;
 
 private:
 

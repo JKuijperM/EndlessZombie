@@ -54,10 +54,6 @@ AZombieCharacter::AZombieCharacter()
 	FollowCamera->SetWorldRotation(FQuat(FRotator(-15.f, 0.f, 0.f)));
 
 	bReadyState = true;
-
-	// HUD
-	ZombiePlayerHUDClass = nullptr;
-	ZombieHUD = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -70,12 +66,6 @@ void AZombieCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-		if (ZombiePlayerHUDClass)
-		{
-			ZombieHUD = CreateWidget<UZombiePlayerHUD>(PlayerController, ZombiePlayerHUDClass);
-			if (ZombieHUD)
-				ZombieHUD->AddToPlayerScreen();
 		}
 	}
 
@@ -91,17 +81,6 @@ void AZombieCharacter::BeginPlay()
 		FlashTimeline.AddInterpFloat(FlashCurve, TimelineCallback);
 		FlashTimeline.SetTimelineFinishedFunc(TimelineFisihedCallback);
 	}
-}
-
-void AZombieCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (ZombieHUD)
-	{
-		ZombieHUD->RemoveFromParent();
-		ZombieHUD = nullptr;
-	}
-
-	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -179,11 +158,6 @@ void AZombieCharacter::RestartLevel()
 	}
 }
 
-//void AZombieCharacter::Crouch(const FInputActionValue& Value)
-//{
-//
-//}
-
 void AZombieCharacter::Die()
 {
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
@@ -211,15 +185,13 @@ void AZombieCharacter::ObstacleCollision()
 	AEndlessZombieGameMode* CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (CurrentGameMode)
 	{
-		CurrentGameMode->iPlayerLife--;
-		if (CurrentGameMode->iPlayerLife > 0)
+		CurrentGameMode->UpdateLive();
+		if (CurrentGameMode->iPlayerLive > 0)
 		{
 			PlayFlashEffect();
-			ZombieHUD->ModifyLiveCounter();
 		}
 		else
 		{
-			ZombieHUD->ModifyLiveCounter();
 			Die();
 		}
 	}

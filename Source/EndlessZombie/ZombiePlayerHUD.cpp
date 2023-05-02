@@ -34,13 +34,18 @@ void UZombiePlayerHUD::NativeConstruct()
 	}
 
 	CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (TextScore)
+	{
+		TextScore->SetText(FText::AsNumber(CurrentGameMode->iScore));
+	}
 }
 
-void UZombiePlayerHUD::ModifyLiveCounter()
+void UZombiePlayerHUD::UpdateLiveCounter()
 {
 	if (CurrentGameMode)
 	{
-		switch (CurrentGameMode->iPlayerLife)
+		switch (CurrentGameMode->iPlayerLive)
 		{
 		case 2:
 			EmptyLive(LiveImg03);
@@ -55,7 +60,15 @@ void UZombiePlayerHUD::ModifyLiveCounter()
 			break;
 		}
 	}
-	
+
+}
+
+void UZombiePlayerHUD::UpdateScoreCounter(int iScore)
+{
+	if (TextScore)
+	{
+		TextScore->SetText(FText::AsNumber(CurrentGameMode->iScore));
+	}
 }
 
 void UZombiePlayerHUD::EmptyLive(UImage* LiveImg)
