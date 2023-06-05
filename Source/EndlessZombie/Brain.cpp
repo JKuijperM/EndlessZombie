@@ -2,6 +2,7 @@
 
 
 #include "Brain.h"
+#include "ZombieCharacter.h"
 #include "EndlessZombieGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/BoxComponent.h"
@@ -22,7 +23,11 @@ void ABrain::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	Super::OnBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	AEndlessZombieGameMode* CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (CurrentGameMode)
-		CurrentGameMode->UpdateScore(iPunctuation);
+	AZombieCharacter* ZombieCharacter = Cast<AZombieCharacter>(OtherActor);
+	if (ZombieCharacter)
+	{
+		AEndlessZombieGameMode* CurrentGameMode = Cast<AEndlessZombieGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (CurrentGameMode)
+			CurrentGameMode->UpdateScore(iPunctuation);
+	}
 }

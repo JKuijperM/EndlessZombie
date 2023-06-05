@@ -2,8 +2,9 @@
 
 
 #include "Tile.h"
-#include "ZombieCharacter.h"
+#include "Brain.h"
 #include "PathGenerator.h"
+#include "ZombieCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -31,7 +32,12 @@ ATile::ATile()
 	ObstacleZone->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	ObstacleZone->SetRelativeLocation(FVector(511.0f, 0.f, 26.0f));
 	ObstacleZone->SetRelativeScale3D(FVector(12.50f, 14.5f, 1.0f));
-
+	
+	// Add the brain zone
+	BrainZone = CreateDefaultSubobject<UBoxComponent>(TEXT("BrainZone"));
+	BrainZone->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	BrainZone->SetRelativeLocation(FVector(511.0f, 0.f, 133.0f));
+	BrainZone->SetRelativeScale3D(FVector(12.50f, 11.16f, 1.0f));
 }
 
 // Called when the game starts or when spawned
@@ -41,8 +47,8 @@ void ATile::BeginPlay()
 
 	EndTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATile::OnBeginOverlap);
 
-	SpawnRandomLocation(ObstacleZone);
-
+	SpawnObstacleAtRandomLocation(ObstacleZone);
+	SpawnBrainAtRandomLocation(BrainZone);
 }
 
 // Called every frame
@@ -83,7 +89,7 @@ void ATile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	}
 }
 
-void ATile::SpawnRandomLocation(UBoxComponent* spawnArea)
+void ATile::SpawnObstacleAtRandomLocation(UBoxComponent* spawnArea)
 {
 	// TODO: Check if I have to spawn something
 	if (ObstacleArray.Num() > 0)
@@ -105,6 +111,20 @@ void ATile::SpawnRandomLocation(UBoxComponent* spawnArea)
 		obstacle->SetActorLocation(vRandomPoint);
 		obstacle->SetActorRotation(GetActorRotation());
 	}
+}
+
+void ATile::SpawnBrainAtRandomLocation(UBoxComponent* spawnArea)
+{
+	FVector vOrigin = spawnArea->Bounds.Origin;
+	FVector vBoxExtent = spawnArea->Bounds.BoxExtent;
+
+	//FVector vRandomPoint = RandomPointInBoundingBox(vOrigin, vBoxExtent);
+	const FVector BoxMin = vOrigin - vBoxExtent;
+	const FVector BoxMax = vOrigin + vBoxExtent;
+	FVector vRandomPoint = FMath::RandPointInBox(FBox(BoxMin, BoxMax));
+
+	ABrain* aBrain = GetWorld()->SpawnActor<ABrain>(vRandomPoint, FRotator::ZeroRotator);
+	//aBrain->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void ATile::DestroyTile()
